@@ -12,8 +12,7 @@ public class Dispatcher {
         //TODO: start server and clients
     }
 
-    private void startServer(InetAddress ip, int port, int numReaders,
-                                int numWriters, int numAccesses) {
+    private void startServer(InetAddress ip, int port, int numReaders, int numWriters) {
         //TODO: ssh stuff
     }
 
