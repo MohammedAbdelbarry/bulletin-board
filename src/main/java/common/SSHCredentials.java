@@ -1,3 +1,5 @@
+package common;
+
 public class SSHCredentials {
     private String userName;
     private String machineAddress;
