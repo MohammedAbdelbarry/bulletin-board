@@ -32,5 +32,4 @@ public class Writer extends SocketClient {
         out.write(response.getRequestSequence() + " " + response.getServiceSequence());
         out.close();
     }
-
 }

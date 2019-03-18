@@ -8,7 +8,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public abstract class SocketClient {
-
     protected Socket sock;
     protected int id;
 
