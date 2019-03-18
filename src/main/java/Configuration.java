@@ -8,16 +8,16 @@ import java.util.List;
 import java.util.Properties;
 
 public class Configuration {
-    private InetAddress serverIp;
+    private SSHCredentials serverInfo;
     private int serverPort;
-    private List<InetAddress> readersAddresses;
-    private List<InetAddress> writersAddresses;
+    private List<SSHCredentials> readersInfo;
+    private List<SSHCredentials> writersInfo;
     private int numberOfAccesses;
     private static final String PROPERTY_PREFIX = "RW.";
 
     public Configuration(String filePath) throws IOException {
-        readersAddresses = new ArrayList<>();
-        writersAddresses = new ArrayList<>();
+        readersInfo = new ArrayList<>();
+        writersInfo = new ArrayList<>();
         File file = new File(filePath);
         if (!file.exists()) {
             throw new IOException("Couldn't find configuration file in directory: " + file.getParentFile().getAbsolutePath());
@@ -25,34 +25,41 @@ public class Configuration {
         Properties prop = new Properties();
         try (InputStream in = new FileInputStream(file)) {
             prop.load(in);
-            serverIp = InetAddress.getByName(prop.getProperty(PROPERTY_PREFIX + "server"));
+            serverInfo = getSSHCredentials(prop, PROPERTY_PREFIX + "server");
             serverPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "server.port"));
             int numReaders = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfReaders"));
             for (int i = 0; i < numReaders; i++) {
-                readersAddresses.add(InetAddress.getByName(prop.getProperty(PROPERTY_PREFIX + "reader" + i)));
+                readersInfo.add(getSSHCredentials(prop, PROPERTY_PREFIX + "reader" + i));
             }
             int numWriters = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfWriters"));
             for (int i = 0; i < numWriters; i++) {
-                writersAddresses.add(InetAddress.getByName(prop.getProperty(PROPERTY_PREFIX + "writer" + i)));
+                writersInfo.add(getSSHCredentials(prop, PROPERTY_PREFIX + "writer" + i));
             }
             numberOfAccesses = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfAccesses"));
         }
     }
 
-    public InetAddress getServerIp() {
-        return serverIp;
+    private SSHCredentials getSSHCredentials(Properties prop, String key) {
+        String cred = prop.getProperty(key);
+        String[] parts = cred.split("@");
+        String password = prop.getProperty(key + ".password");
+        return new SSHCredentials(parts[0], parts[1], password);
+    }
+
+    public SSHCredentials getServerInfo() {
+        return serverInfo;
     }
 
     public int getServerPort() {
         return serverPort;
     }
 
-    public List<InetAddress> getReadersAddresses() {
-        return readersAddresses;
+    public List<SSHCredentials> getReadersAddresses() {
+        return readersInfo;
     }
 
-    public List<InetAddress> getWritersAddresses() {
-        return writersAddresses;
+    public List<SSHCredentials> getWritersAddresses() {
+        return writersInfo;
     }
 
     public int getNumberOfAccesses() {
