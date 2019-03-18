@@ -8,12 +8,12 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class Reader extends Client{
-    private int numAccesses;
+public class Reader extends Client {
+    private int numberOfAccesses;
 
-    public Reader(int id, String serverIP, int port, int numAccesses) throws IOException {
+    public Reader(int id, String serverIP, int port, int numberOfAccesses) throws IOException {
         super(id, serverIP, port);
-        this.numAccesses = numAccesses;
+        this.numberOfAccesses = numberOfAccesses;
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("log" + id));
         out.write("Client type: Reader\nClient type:"
@@ -23,16 +23,14 @@ public class Reader extends Client{
 
     public void read() throws IOException, ClassNotFoundException {
         boolean isLast = false;
-        while (numAccesses != 0) {
-            if (numAccesses == 1) {
+        while (numberOfAccesses != 0) {
+            if (numberOfAccesses == 1) {
                 isLast = true;
             }
             Request request = new Request(id, RequestType.READ, Integer.toString(id), isLast);
             executeRequest(request);
-            numAccesses--;
+            numberOfAccesses--;
         }
-
-
     }
 
     void log(Response response) throws IOException {

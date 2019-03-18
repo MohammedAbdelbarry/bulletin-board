@@ -9,11 +9,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 public class Writer extends Client {
-    private int numAccesses;
+    private int numberOfAccesses;
 
-    public Writer(int id, String serverIP, int port, int numAccesses) throws IOException {
+    public Writer(int id, String serverIP, int port, int numberOfAccesses) throws IOException {
         super(id, serverIP, port);
-        this.numAccesses = numAccesses;
+        this.numberOfAccesses = numberOfAccesses;
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("log" + id));
         out.write("Client type: Writer\nClient type:"
@@ -23,13 +23,13 @@ public class Writer extends Client {
 
     public void write() throws IOException, ClassNotFoundException {
         boolean isLast = false;
-        while (numAccesses != 0) {
-            if (numAccesses == 1) {
+        while (numberOfAccesses != 0) {
+            if (numberOfAccesses == 1) {
                 isLast = true;
             }
             Request request = new Request(id, RequestType.WRITE, Integer.toString(id), isLast);
             executeRequest(request);
-            numAccesses--;
+            numberOfAccesses--;
         }
     }
 

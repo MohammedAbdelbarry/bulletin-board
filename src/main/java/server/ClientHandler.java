@@ -13,13 +13,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClientHandler extends Thread {
     private Socket socket;
     private FileHandler fileHandler;
-    private AtomicInteger numRequests;
+    private AtomicInteger numberOfRequests;
 
     public ClientHandler(Socket socket, FileHandler fileHandler,
-                            AtomicInteger numRequests) {
+                            AtomicInteger numberOfRequests) {
         this.socket = socket;
         this.fileHandler = fileHandler;
-        this.numRequests = numRequests;
+        this.numberOfRequests = numberOfRequests;
     }
 
     public void run() {
@@ -34,7 +34,7 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
             if (request != null) {
-                numRequests.decrementAndGet(); // not interested in the return value
+                numberOfRequests.decrementAndGet(); // not interested in the return value
                 isLast = request.isLast();
                 if (request.getType() == RequestType.READ) {
                     try {
@@ -44,7 +44,7 @@ public class ClientHandler extends Thread {
                     }
                 } else {
                     try {
-                        response = fileHandler.write(request.getClientId(), request.getData());
+                        response = fileHandler.write(request.getClientId(), request.getBody());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -56,7 +56,6 @@ public class ClientHandler extends Thread {
                     e.printStackTrace();
                 }
             }
-
         } while (!isLast);
     }
 }

@@ -5,13 +5,13 @@ import java.io.Serializable;
 public class Request implements Serializable {
     private int clientId;
     private RequestType type;
-    private String data;
+    private String body;
     private boolean isLast;
 
-    public Request(int clientId, RequestType type, String data, boolean isLast) {
+    public Request(int clientId, RequestType type, String body, boolean isLast) {
         this.clientId = clientId;
         this.type = type;
-        this.data = data;
+        this.body = body;
         this.isLast = isLast;
     }
 
@@ -23,8 +23,8 @@ public class Request implements Serializable {
         return type;
     }
 
-    public String getData() {
-        return data;
+    public String getBody() {
+        return body;
     }
 
     public boolean isLast() {
