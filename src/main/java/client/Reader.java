@@ -4,12 +4,16 @@ import common.Request;
 import common.RequestType;
 import common.Response;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
-public class Reader extends SocketClient{
+public class Reader extends Client{
+    private int numAccesses;
 
-    public Reader(int id, String serverIP, int port) throws IOException {
+    public Reader(int id, String serverIP, int port, int numAccesses) throws IOException {
         super(id, serverIP, port);
+        this.numAccesses = numAccesses;
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("log" + id));
         out.write("Client type: Reader\nClient type:"
@@ -18,8 +22,17 @@ public class Reader extends SocketClient{
     }
 
     public void read() throws IOException, ClassNotFoundException {
-        Request request = new Request(RequestType.READ, Integer.toString(id));
-        executeRequest(request);
+        boolean isLast = false;
+        while (numAccesses != 0) {
+            if (numAccesses == 1) {
+                isLast = true;
+            }
+            Request request = new Request(id, RequestType.READ, Integer.toString(id), isLast);
+            executeRequest(request);
+            numAccesses--;
+        }
+
+
     }
 
     void log(Response response) throws IOException {

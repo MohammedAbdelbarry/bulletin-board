@@ -7,14 +7,14 @@ import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-public abstract class SocketClient {
-    protected Socket sock;
+public abstract class Client {
+    protected Socket socket;
     protected int id;
 
-    public SocketClient(int id, String serverIP, int port) {
+    public Client(int id, String serverIP, int serverPort) {
         this.id = id;
         try {
-            sock = new Socket(serverIP, port);
+            socket = new Socket(serverIP, serverPort);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -23,13 +23,13 @@ public abstract class SocketClient {
     abstract void log(Response response) throws IOException;
 
     public void sendRequest(Request request) throws IOException {
-        ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
+        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
         out.writeObject(request);
     }
 
     protected void executeRequest(Request request) throws IOException, ClassNotFoundException {
         sendRequest(request);
-        ObjectInputStream in = new ObjectInputStream(sock.getInputStream());
+        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
         Response response = (Response) in.readObject();
         log(response);
     }
