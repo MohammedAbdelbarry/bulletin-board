@@ -16,8 +16,8 @@ public class FileHandler {
     private AtomicInteger rSeq;
     private Random random;
     private String fileData;
-
-    public FileHandler() throws FileNotFoundException {
+    
+    public FileHandler() {
         rwLock = new ReentrantReadWriteLock();
         rNum = new AtomicInteger();
         sSeq = new AtomicInteger();
