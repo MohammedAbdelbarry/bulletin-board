@@ -7,10 +7,14 @@ public class Response implements Serializable {
     private int requestSequence;
     private String body;
 
-    public Response(int serviceSequence, int requestSequence){
+    public Response(int serviceSequence, int requestSequence, String body) {
         this.serviceSequence = serviceSequence;
         this.requestSequence = requestSequence;
-        this.body = "";
+        this.body = body;
+    }
+
+    public Response(int serviceSequence, int requestSequence) {
+        this(serviceSequence, requestSequence, "");
     }
 
     public int getServiceSequence(){
