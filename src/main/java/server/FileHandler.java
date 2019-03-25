@@ -2,14 +2,12 @@ package server;
 
 import common.Response;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class FileHandler {
+public class FileHandler implements RemoteHandler {
     private ReadWriteLock rwLock;
     private AtomicInteger rNum;
     private AtomicInteger sSeq;
@@ -26,7 +24,7 @@ public class FileHandler {
         fileData = "";
     }
 
-    public Response read(int rid) throws IOException {
+    public Response read(int rid) {
         int curRSeq = rSeq.incrementAndGet();
         rwLock.readLock().lock();
         int curRNum = rNum.incrementAndGet();
@@ -48,7 +46,7 @@ public class FileHandler {
         return new Response(curSSeq, curRSeq, data);
     }
 
-    public Response write(int wid, String data) throws IOException {
+    public Response write(int wid, String data) {
         int curRSeq = rSeq.incrementAndGet();
         rwLock.writeLock().lock();
         try {
