@@ -1,5 +1,7 @@
 package server;
 
+import java.io.IOException;
+
 public class ServerMain {
 
     public static void main(String[] args) {
@@ -8,11 +10,16 @@ public class ServerMain {
         }
 
         int serverPort = Integer.parseInt(args[0]);
-        int numReaders = Integer.parseInt(args[1]);
-        int numWriters = Integer.parseInt(args[2]);
+        int numRequests = Integer.parseInt(args[1]);
 
-        Server server = new Server(serverPort, numReaders, numWriters);
-
-        server.start();
+        Server server = null;
+        try {
+            server = new Server(serverPort, numRequests);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (server != null) {
+            server.start();
+        }
     }
 }

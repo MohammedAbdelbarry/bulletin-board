@@ -14,7 +14,7 @@ import java.net.UnknownHostException;
 public class Dispatcher {
     private static final String READER_JAR_PATH = "./reader.jar";
     private static final String WRITER_JAR_PATH = "./writer.jar";
-    private static final String SERVER_JARPATH = "./server.jar";
+    private static final String SERVER_JAR_PATH = "./server.jar";
 
     public Dispatcher() {
 
@@ -23,10 +23,10 @@ public class Dispatcher {
     private void start(Configuration configuration) throws UnknownHostException, JSchException, SftpException {
         InetAddress serverIp = InetAddress.getByName(configuration.getServerInfo().getMachineAddress());
         // TODO: Test the nohup channel termination.
-        startServer(configuration.getServerInfo(),
-                configuration.getServerPort(),
-                configuration.getReadersAddresses().size(),
-                configuration.getWritersAddresses().size());
+        int numRequests = (configuration.getReadersAddresses().size()
+                    + configuration.getWritersAddresses().size()) * configuration.getNumberOfAccesses();
+        startServer(configuration.getServerInfo(), configuration.getServerPort(),
+                    numRequests);
         for (int i = 0; i < configuration.getReadersAddresses().size(); i++) {
             startReader(configuration.getReadersAddresses().get(i),
                     serverIp,
@@ -66,12 +66,11 @@ public class Dispatcher {
         execChannel.disconnect();
     }
 
-    private void startServer(SSHCredentials serverInfo, int port, int numReaders,
-                                int numWriters) throws JSchException, SftpException {
+    private void startServer(SSHCredentials serverInfo, int port, int totalAccesses) throws JSchException, SftpException {
         Session session = getSession(serverInfo);
-        copyToRemote(session, SERVER_JARPATH, SERVER_JARPATH);
+        copyToRemote(session, SERVER_JAR_PATH, SERVER_JAR_PATH);
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JARPATH, port, numReaders, numWriters));
+        execOnRemote(session, String.format("nohup java -jar %s %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, totalAccesses));
     }
 
     private void startClient(String jarPath, SSHCredentials clientInfo,

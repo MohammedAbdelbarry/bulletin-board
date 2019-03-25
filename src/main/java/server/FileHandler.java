@@ -14,7 +14,7 @@ public class FileHandler implements RemoteHandler {
     private AtomicInteger rSeq;
     private Random random;
     private String fileData;
-
+    
     public FileHandler() {
         rwLock = new ReentrantReadWriteLock();
         rNum = new AtomicInteger();

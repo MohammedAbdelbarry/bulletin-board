@@ -7,13 +7,13 @@ import common.Response;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
 
-public class Writer extends SocketClient {
+public class Writer extends Client {
+    private int numberOfAccesses;
 
-    public Writer(int id, String serverIP, int port) throws IOException {
+    public Writer(int id, String serverIP, int port, int numberOfAccesses) throws IOException {
         super(id, serverIP, port);
-
+        this.numberOfAccesses = numberOfAccesses;
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("log" + id));
         out.write("Client type: Writer\nClient type:"
@@ -22,8 +22,15 @@ public class Writer extends SocketClient {
     }
 
     public void write() throws IOException, ClassNotFoundException {
-        Request request = new Request(RequestType.WRITE, Integer.toString(id));
-        executeRequest(request);
+        boolean isLast = false;
+        while (numberOfAccesses != 0) {
+            if (numberOfAccesses == 1) {
+                isLast = true;
+            }
+            Request request = new Request(id, RequestType.WRITE, Integer.toString(id), isLast);
+            executeRequest(request);
+            numberOfAccesses--;
+        }
     }
 
     void log(Response response) throws IOException {
@@ -32,5 +39,4 @@ public class Writer extends SocketClient {
         out.write(response.getRequestSequence() + " " + response.getServiceSequence());
         out.close();
     }
-
 }
