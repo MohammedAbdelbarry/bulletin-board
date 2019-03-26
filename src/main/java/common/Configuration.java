@@ -28,22 +28,22 @@ public class Configuration {
         try (InputStream in = new FileInputStream(file)) {
             prop.load(in);
             serverInfo = getSSHCredentials(prop, PROPERTY_PREFIX + "server");
-            serverPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "server.port"));
-            int numReaders = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfReaders"));
+            serverPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "server.port", "0"));
+            int numReaders = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfReaders", "0"));
             for (int i = 0; i < numReaders; i++) {
                 readersInfo.add(getSSHCredentials(prop, PROPERTY_PREFIX + "reader" + i));
             }
-            int numWriters = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfWriters"));
+            int numWriters = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfWriters", "0"));
             for (int i = 0; i < numWriters; i++) {
                 writersInfo.add(getSSHCredentials(prop, PROPERTY_PREFIX + "writer" + i));
             }
-            numberOfAccesses = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfAccesses"));
-            rmiPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "rmiregistry.port"));
+            numberOfAccesses = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfAccesses", "0"));
+            rmiPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "rmiregistry.port", "0"));
         }
     }
 
     private SSHCredentials getSSHCredentials(Properties prop, String key) {
-        String cred = prop.getProperty(key);
+        String cred = prop.getProperty(key, "default@localhost");
         String[] parts = cred.split("@");
         String password = prop.getProperty(key + ".password");
         return new SSHCredentials(parts[0], parts[1], password);
