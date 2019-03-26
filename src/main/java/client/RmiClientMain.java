@@ -22,7 +22,7 @@ public class RmiClientMain {
         int rmiPort = Integer.parseInt(args[5]);
 
         Registry registry = LocateRegistry.getRegistry(serverIp, rmiPort);
-        RemoteHandler stub = (RemoteHandler) registry.lookup("Bulleting Board");
+        RemoteHandler stub = (RemoteHandler) registry.lookup("bulletin");
 
         RequestExecutor executor = new RmiExecutor(stub);
         switch (type) {
