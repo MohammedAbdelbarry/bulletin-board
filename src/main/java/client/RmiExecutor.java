@@ -1,11 +1,8 @@
 package client;
 
 import common.Request;
-import common.RequestType;
 import common.Response;
 import server.RemoteHandler;
-
-import java.io.IOException;
 
 public class RmiExecutor implements RequestExecutor {
     private RemoteHandler handler;

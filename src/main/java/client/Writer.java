@@ -4,21 +4,16 @@ import common.Request;
 import common.RequestType;
 import common.Response;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 
 public class Writer extends Client {
     private int numberOfAccesses;
 
-    public Writer(int id, RequestExecutor executor, int numberOfAccesses) throws IOException {
+    public Writer(int id, RequestExecutor executor, int numberOfAccesses) {
         super(id, executor);
         this.numberOfAccesses = numberOfAccesses;
-        BufferedWriter out = new BufferedWriter(
-                new FileWriter("log" + id));
-        out.write("Client type: Writer\nClient type:"
-                + id + "\n" + "rSeq  sSeq\n");
-        out.close();
+        System.out.println("Client type: Writer\nClient id:"
+                + id + "\n" + "rSeq  sSeq");
     }
 
     public void write() throws IOException, ClassNotFoundException {
@@ -29,14 +24,16 @@ public class Writer extends Client {
             }
             Request request = new Request(id, RequestType.WRITE, Integer.toString(id), isLast);
             executeRequest(request);
+            try {
+                Thread.sleep(random.nextInt(10000));
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             numberOfAccesses--;
         }
     }
 
-    void log(Response response) throws IOException {
-        BufferedWriter out = new BufferedWriter(
-             new FileWriter("log" + id, true));
-        out.write(response.getRequestSequence() + " " + response.getServiceSequence());
-        out.close();
+    void log(Response response) {
+        System.out.println(response.getRequestSequence() + " " + response.getServiceSequence());
     }
 }

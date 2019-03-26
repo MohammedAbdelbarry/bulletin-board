@@ -5,12 +5,11 @@ import server.RemoteHandler;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 public class RmiClientMain {
-    public static void main(String[] args) throws IOException, NotBoundException {
+    public static void main(String[] args) throws IOException, NotBoundException, ClassNotFoundException {
         if (args.length < 6) {
             throw new IllegalArgumentException("Invalid number of arguments");
         }
@@ -27,10 +26,10 @@ public class RmiClientMain {
         RequestExecutor executor = new RmiExecutor(stub);
         switch (type) {
             case READER:
-                Client reader = new Reader(clientId, executor, numRequests);
+                new Reader(clientId, executor, numRequests).read();
                 break;
             case WRITER:
-                Client writer = new Writer(clientId, executor, numRequests);
+                new Writer(clientId, executor, numRequests).write();
                 break;
             default:
                 break;
