@@ -25,8 +25,9 @@ public class Dispatcher {
         // TODO: Test the nohup channel termination.
         int numRequests = (configuration.getReadersAddresses().size()
                     + configuration.getWritersAddresses().size()) * configuration.getNumberOfAccesses();
+        int rmiPort = configuration.getRmiPort();
         startServer(configuration.getServerInfo(), configuration.getServerPort(),
-                    numRequests);
+                    numRequests, rmiPort);
         for (int i = 0; i < configuration.getReadersAddresses().size(); i++) {
             startReader(configuration.getReadersAddresses().get(i),
                     serverIp,
@@ -66,11 +67,11 @@ public class Dispatcher {
         execChannel.disconnect();
     }
 
-    private void startServer(SSHCredentials serverInfo, int port, int totalAccesses) throws JSchException, SftpException {
+    private void startServer(SSHCredentials serverInfo, int port, int totalAccesses, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(serverInfo);
         copyToRemote(session, SERVER_JAR_PATH, SERVER_JAR_PATH);
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, totalAccesses));
+        execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, totalAccesses, rmiPort));
     }
 
     private void startClient(String jarPath, SSHCredentials clientInfo,

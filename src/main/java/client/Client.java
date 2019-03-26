@@ -8,29 +8,17 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 
 public abstract class Client {
-    protected Socket socket;
     protected int id;
+    protected RequestExecutor executor;
 
-    public Client(int id, String serverIP, int serverPort) {
+    public Client(int id, RequestExecutor executor) {
         this.id = id;
-        try {
-            socket = new Socket(serverIP, serverPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        this.executor = executor;
     }
 
     abstract void log(Response response) throws IOException;
 
-    public void sendRequest(Request request) throws IOException {
-        ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-        out.writeObject(request);
-    }
-
     protected void executeRequest(Request request) throws IOException, ClassNotFoundException {
-        sendRequest(request);
-        ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
-        Response response = (Response) in.readObject();
-        log(response);
+        log(executor.executeRequest(request));
     }
 }

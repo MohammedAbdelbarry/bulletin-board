@@ -15,6 +15,7 @@ public class Configuration {
     private List<SSHCredentials> writersInfo;
     private int numberOfAccesses;
     private static final String PROPERTY_PREFIX = "RW.";
+    private int rmiPort;
 
     public Configuration(String filePath) throws IOException {
         readersInfo = new ArrayList<>();
@@ -37,6 +38,7 @@ public class Configuration {
                 writersInfo.add(getSSHCredentials(prop, PROPERTY_PREFIX + "writer" + i));
             }
             numberOfAccesses = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "numberOfAccesses"));
+            rmiPort = Integer.parseInt(prop.getProperty(PROPERTY_PREFIX + "rmiregistry.port"));
         }
     }
 
@@ -65,5 +67,9 @@ public class Configuration {
 
     public int getNumberOfAccesses() {
         return numberOfAccesses;
+    }
+
+    public int getRmiPort() {
+        return rmiPort;
     }
 }

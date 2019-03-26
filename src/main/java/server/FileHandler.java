@@ -12,6 +12,7 @@ public class FileHandler implements RemoteHandler {
     private AtomicInteger rNum;
     private AtomicInteger sSeq;
     private AtomicInteger rSeq;
+
     private Random random;
     private String fileData;
     
@@ -22,6 +23,10 @@ public class FileHandler implements RemoteHandler {
         rSeq = new AtomicInteger();
         random = new Random();
         fileData = "";
+    }
+
+    public int getNumRequests() {
+        return rSeq.get();
     }
 
     public Response read(int rid) {
