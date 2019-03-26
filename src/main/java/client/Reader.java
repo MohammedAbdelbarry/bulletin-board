@@ -11,6 +11,11 @@ public class Reader extends Client {
 
     public Reader(int id, RequestExecutor executor, int numberOfAccesses) {
         super(id, executor);
+        try {
+            Thread.sleep(random.nextInt(SLEEP_DURATION));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         this.numberOfAccesses = numberOfAccesses;
         System.out.println("Client type: Reader\nClient id:"
                 + id + "\n" + "rSeq  sSeq  oVal");
@@ -25,7 +30,7 @@ public class Reader extends Client {
             Request request = new Request(id, RequestType.READ, Integer.toString(id), isLast);
             executeRequest(request);
             try {
-                Thread.sleep(random.nextInt(10000));
+                Thread.sleep(random.nextInt(SLEEP_DURATION));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

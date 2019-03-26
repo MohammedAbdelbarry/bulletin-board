@@ -13,19 +13,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class ClientHandler extends Thread {
     private Socket socket;
     private FileHandler fileHandler;
-    private AtomicInteger numberOfRequests;
 
-    public ClientHandler(Socket socket, FileHandler fileHandler,
-                            AtomicInteger numberOfRequests) {
+    public ClientHandler(Socket socket, FileHandler fileHandler) {
         this.socket = socket;
         this.fileHandler = fileHandler;
-        this.numberOfRequests = numberOfRequests;
     }
 
     public void run() {
         boolean isLast = false;
         Request request = null;
-        Response response = null;
+        Response response;
         do {
             try {
                 ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
@@ -34,7 +31,6 @@ public class ClientHandler extends Thread {
                 e.printStackTrace();
             }
             if (request != null) {
-                numberOfRequests.decrementAndGet(); // not interested in the return value
                 isLast = request.isLast();
                 if (request.getType() == RequestType.READ) {
                     response = fileHandler.read(request.getClientId());

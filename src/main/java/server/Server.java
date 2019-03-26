@@ -10,18 +10,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Server {
     private ServerSocket serverSocket;
     private Socket clientSocket;
-    private AtomicInteger numberOfRequests;
+    private int  numberOfClients;
     private List<ClientHandler> clientHandlers;
     private FileHandler fileHandler;
 
-    public Server(int serverPort, int numberOfRequests) throws IOException {
+    public Server(int serverPort, int numberOfClients) throws IOException {
         serverSocket = new ServerSocket(serverPort);
         fileHandler = new FileHandler();
-        this.numberOfRequests = new AtomicInteger(numberOfRequests);
+        this.numberOfClients = numberOfClients;
     }
 
     public void start() {
-        while (numberOfRequests.get() != 0) {
+        while (true) {
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
@@ -31,8 +31,12 @@ public class Server {
                 clientHandlers = new ArrayList<>();
             }
             ClientHandler clientHandler = new ClientHandler(clientSocket,
-                        fileHandler, numberOfRequests);
+                        fileHandler);
             clientHandler.start();
+            numberOfClients--;
+            if (numberOfClients == 0) {
+                break;
+            }
             clientHandlers.add(clientHandler);
         }
         stop();
@@ -46,5 +50,6 @@ public class Server {
                 e.printStackTrace();
             }
         }
+        fileHandler.log();
     }
 }

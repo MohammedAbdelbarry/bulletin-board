@@ -11,6 +11,11 @@ public class Writer extends Client {
 
     public Writer(int id, RequestExecutor executor, int numberOfAccesses) {
         super(id, executor);
+        try {
+            Thread.sleep(random.nextInt(SLEEP_DURATION));
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         this.numberOfAccesses = numberOfAccesses;
         System.out.println("Client type: Writer\nClient id:"
                 + id + "\n" + "rSeq  sSeq");
@@ -25,7 +30,7 @@ public class Writer extends Client {
             Request request = new Request(id, RequestType.WRITE, Integer.toString(id), isLast);
             executeRequest(request);
             try {
-                Thread.sleep(random.nextInt(10000));
+                Thread.sleep(random.nextInt(SLEEP_DURATION));
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }

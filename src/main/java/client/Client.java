@@ -11,6 +11,8 @@ public abstract class Client {
     protected RequestExecutor executor;
     protected Random random;
 
+    protected static final int SLEEP_DURATION = 10000;
+
     public Client(int id, RequestExecutor executor) {
         this.id = id;
         this.executor = executor;

@@ -23,6 +23,7 @@ public class RmiServerMain {
             while (handler.getNumRequests() < numRequests) {
                 Thread.sleep(1000);
             }
+            handler.log();
         } catch (RemoteException | AlreadyBoundException | InterruptedException e) {
             e.printStackTrace();
         }

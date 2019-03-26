@@ -1,8 +1,8 @@
 package common;
 
 public enum ClientType {
-    READER("reader"),
-    WRITER("writer");
+    READER("READER"),
+    WRITER("WRITER");
 
     private String value;
 

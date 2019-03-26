@@ -6,6 +6,7 @@ import common.Response;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class SocketExecutor implements RequestExecutor {
@@ -13,7 +14,8 @@ public class SocketExecutor implements RequestExecutor {
 
     public SocketExecutor(String serverIP, int serverPort) {
         try {
-            socket = new Socket(serverIP, serverPort);
+            InetAddress address = InetAddress.getByName(serverIP);
+            socket = new Socket(address, serverPort);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -43,9 +43,9 @@ public class Configuration {
     }
 
     private SSHCredentials getSSHCredentials(Properties prop, String key) {
-        String cred = prop.getProperty(key, "default@localhost");
+        String cred = prop.getProperty(key, "hduser@localhost");
         String[] parts = cred.split("@");
-        String password = prop.getProperty(key + ".password");
+        String password = prop.getProperty(key + ".password", "hadoop");
         return new SSHCredentials(parts[0], parts[1], password);
     }
 

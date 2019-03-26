@@ -12,22 +12,19 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 public class Dispatcher {
-    private static final String READER_JAR_PATH = "./reader.jar";
-    private static final String WRITER_JAR_PATH = "./writer.jar";
-    private static final String SERVER_JAR_PATH = "./server.jar";
+    private static final String SERVER_JAR_PATH = "server.jar";
 
     public Dispatcher() {
-
+        JSch.setConfig("StrictHostKeyChecking", "no");
     }
 
     private void start(Configuration configuration) throws UnknownHostException, JSchException, SftpException {
         InetAddress serverIp = InetAddress.getByName(configuration.getServerInfo().getMachineAddress());
         // TODO: Test the nohup channel termination.
-        int numRequests = (configuration.getReadersAddresses().size()
-                    + configuration.getWritersAddresses().size()) * configuration.getNumberOfAccesses();
+        int numberOfClients = configuration.getReadersAddresses().size() + configuration.getWritersAddresses().size();
         int rmiPort = configuration.getRmiPort();
         startServer(configuration.getServerInfo(), configuration.getServerPort(),
-                    numRequests, rmiPort);
+                    numberOfClients, rmiPort);
         for (int i = 0; i < configuration.getReadersAddresses().size(); i++) {
             startReader(configuration.getReadersAddresses().get(i),
                     serverIp,
@@ -35,8 +32,16 @@ public class Dispatcher {
                     configuration.getNumberOfAccesses(),
                     i,
                     rmiPort);
+            if (i < configuration.getWritersAddresses().size()) {
+                startWriter(configuration.getWritersAddresses().get(i),
+                        serverIp,
+                        configuration.getServerPort(),
+                        configuration.getNumberOfAccesses(),
+                        i,
+                        rmiPort);
+            }
         }
-        for (int i = 0; i < configuration.getWritersAddresses().size(); i++) {
+        for (int i = configuration.getReadersAddresses().size(); i < configuration.getWritersAddresses().size(); i++) {
             startWriter(configuration.getWritersAddresses().get(i),
                     serverIp,
                     configuration.getServerPort(),
@@ -49,6 +54,7 @@ public class Dispatcher {
     private Session getSession(SSHCredentials creds) throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(creds.getUserName(), creds.getMachineAddress());
+        System.out.println(creds.getUserName() + " " + creds.getMachineAddress() + " " + creds.getPassword());
         session.setPassword(creds.getPassword());
         session.connect();
 
@@ -57,8 +63,9 @@ public class Dispatcher {
 
     private void copyToRemote(Session session, String localPath, String remotePath) throws JSchException, SftpException {
         ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
+//        sftpChannel.lcd(System.getProperty("user.dir"));
+        System.out.println(sftpChannel.lpwd());
         sftpChannel.connect();
-        sftpChannel.cd("~");
         sftpChannel.put(localPath, remotePath);
         sftpChannel.disconnect();
     }
@@ -71,11 +78,12 @@ public class Dispatcher {
         execChannel.disconnect();
     }
 
-    private void startServer(SSHCredentials serverInfo, int port, int totalAccesses, int rmiPort) throws JSchException, SftpException {
+    private void startServer(SSHCredentials serverInfo, int port, int numberOfClients, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(serverInfo);
         copyToRemote(session, SERVER_JAR_PATH, SERVER_JAR_PATH);
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, totalAccesses, rmiPort));
+        execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, numberOfClients, rmiPort));
+        session.disconnect();
     }
 
     private void startClient(SSHCredentials clientInfo, String logFile, ClientType type,
@@ -83,8 +91,9 @@ public class Dispatcher {
         Session session = getSession(clientInfo);
         copyToRemote(session, "client.jar", "client.jar");
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar client.jar %s %s %d %d %d %d > %s  2>&1 &", type,
-                serverIp, serverPort, numAccesses, clientId, rmiPort, logFile));
+        execOnRemote(session, String.format("nohup java -jar client.jar %s %s %d %d %d %d > %s  2>&1 &", type.toString(),
+                serverIp.getHostAddress(), serverPort, numAccesses, clientId, rmiPort, logFile));
+        session.disconnect();
     }
 
     private void startReader(SSHCredentials readerInfo, InetAddress serverIp, int serverPort,

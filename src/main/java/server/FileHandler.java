@@ -2,6 +2,8 @@ package server;
 
 import common.Response;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -15,18 +17,36 @@ public class FileHandler implements RemoteHandler {
 
     private Random random;
     private String fileData;
+    private List<String> readLogs;
+    private List<String> writeLogs;
+    private static final int SLEEP_DURATION = 10000;
+
     
     public FileHandler() {
-        rwLock = new ReentrantReadWriteLock();
+        rwLock = new ReentrantReadWriteLock(true);
         rNum = new AtomicInteger();
         sSeq = new AtomicInteger();
         rSeq = new AtomicInteger();
         random = new Random();
-        fileData = "";
+        readLogs = new ArrayList<>();
+        writeLogs = new ArrayList<>();
+        fileData = "-1";
     }
 
     public int getNumRequests() {
         return rSeq.get();
+    }
+
+    public void log() {
+        System.out.println("sSeq\toVal\trID\trNum");
+        for (String readLog : readLogs) {
+            System.out.println(readLog);
+        }
+        System.out.println();
+        System.out.println("sSeq\toVal\trID");
+        for (String writeLog : writeLogs) {
+            System.out.println(writeLog);
+        }
     }
 
     public Response read(int rid) {
@@ -34,7 +54,7 @@ public class FileHandler implements RemoteHandler {
         rwLock.readLock().lock();
         int curRNum = rNum.incrementAndGet();
         try {
-            Thread.sleep(random.nextInt(10000));
+            Thread.sleep(random.nextInt(SLEEP_DURATION));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -46,7 +66,7 @@ public class FileHandler implements RemoteHandler {
         int curSSeq = sSeq.incrementAndGet();
 
         // TODO: log
-        System.out.println(curSSeq + "\t" + data + "\t" + rid + "\t" + curRNum);
+        readLogs.add(curSSeq + "\t" + data + "\t" + rid + "\t" + curRNum);
 
         return new Response(curSSeq, curRSeq, data);
     }
@@ -55,7 +75,7 @@ public class FileHandler implements RemoteHandler {
         int curRSeq = rSeq.incrementAndGet();
         rwLock.writeLock().lock();
         try {
-            Thread.sleep(random.nextInt(10000));
+            Thread.sleep(random.nextInt(SLEEP_DURATION));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
@@ -67,7 +87,7 @@ public class FileHandler implements RemoteHandler {
         int curSSeq = sSeq.incrementAndGet();
 
         // TODO: log
-        System.out.println(curSSeq + "\t" + data + "\t" + wid + "\t");
+        writeLogs.add(curSSeq + "\t" + data + "\t" + wid + "\t");
 
         return new Response(curSSeq, curRSeq);
     }

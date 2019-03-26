@@ -2,6 +2,7 @@ package client;
 
 import common.ClientType;
 
+import java.util.Arrays;
 import java.io.IOException;
 
 public class ClientMain {
@@ -10,6 +11,8 @@ public class ClientMain {
         if (args.length < 5) {
             throw new IllegalArgumentException("Invalid number of arguments");
         }
+
+        System.out.println(Arrays.toString(args));
 
         ClientType type = ClientType.valueOf(args[0]);
         String serverIp = args[1];
