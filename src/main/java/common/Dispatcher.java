@@ -24,7 +24,7 @@ public class Dispatcher {
         int numberOfClients = configuration.getReadersAddresses().size() + configuration.getWritersAddresses().size();
         int rmiPort = configuration.getRmiPort();
         startServer(configuration.getServerInfo(), configuration.getServerPort(),
-                    numberOfClients, rmiPort);
+                    numberOfClients, configuration.getNumberOfAccesses(), rmiPort);
         for (int i = 0; i < configuration.getReadersAddresses().size(); i++) {
             startReader(configuration.getReadersAddresses().get(i),
                     serverIp,
@@ -78,11 +78,11 @@ public class Dispatcher {
         execChannel.disconnect();
     }
 
-    private void startServer(SSHCredentials serverInfo, int port, int numberOfClients, int rmiPort) throws JSchException, SftpException {
+    private void startServer(SSHCredentials serverInfo, int port, int numberOfClients, int numberOfAccesses, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(serverInfo);
         copyToRemote(session, SERVER_JAR_PATH, SERVER_JAR_PATH);
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, numberOfClients, rmiPort));
+        execOnRemote(session, String.format("nohup java -jar %s %d %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, numberOfClients, numberOfAccesses, rmiPort));
         session.disconnect();
     }
 

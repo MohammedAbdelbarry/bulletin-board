@@ -5,6 +5,7 @@ import common.Response;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -28,13 +29,14 @@ public class FileHandler implements RemoteHandler {
         sSeq = new AtomicInteger();
         rSeq = new AtomicInteger();
         random = new Random();
-        readLogs = new ArrayList<>();
-        writeLogs = new ArrayList<>();
+
+        readLogs = new Vector<>();
+        writeLogs = new Vector<>();
         fileData = "-1";
     }
 
     public int getNumRequests() {
-        return rSeq.get();
+        return sSeq.get();
     }
 
     public void log() {

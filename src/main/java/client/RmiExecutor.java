@@ -4,6 +4,8 @@ import common.Request;
 import common.Response;
 import server.RemoteHandler;
 
+import java.rmi.RemoteException;
+
 public class RmiExecutor implements RequestExecutor {
     private RemoteHandler handler;
 
@@ -13,7 +15,7 @@ public class RmiExecutor implements RequestExecutor {
 
 
     @Override
-    public Response executeRequest(Request request) {
+    public Response executeRequest(Request request) throws RemoteException {
         switch (request.getType()) {
             case READ:
                 return handler.read(request.getClientId());

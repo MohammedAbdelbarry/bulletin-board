@@ -5,7 +5,7 @@ import java.io.IOException;
 public class ServerMain {
 
     public static void main(String[] args) {
-        if (args.length < 3) {
+        if (args.length < 2) {
             throw new IllegalArgumentException("Invalid number of arguments");
         }
 
