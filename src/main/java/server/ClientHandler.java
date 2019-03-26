@@ -37,17 +37,9 @@ public class ClientHandler extends Thread {
                 numberOfRequests.decrementAndGet(); // not interested in the return value
                 isLast = request.isLast();
                 if (request.getType() == RequestType.READ) {
-                    try {
-                        response = fileHandler.read(request.getClientId());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    response = fileHandler.read(request.getClientId());
                 } else {
-                    try {
-                        response = fileHandler.write(request.getClientId(), request.getBody());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    response = fileHandler.write(request.getClientId(), request.getBody());
                 }
                 try {
                     ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
