@@ -32,13 +32,17 @@ public class Dispatcher {
             startReader(configuration.getReadersAddresses().get(i),
                     serverIp,
                     configuration.getServerPort(),
-                    configuration.getNumberOfAccesses());
+                    configuration.getNumberOfAccesses(),
+                    i,
+                    rmiPort);
         }
         for (int i = 0; i < configuration.getWritersAddresses().size(); i++) {
             startWriter(configuration.getWritersAddresses().get(i),
                     serverIp,
                     configuration.getServerPort(),
-                    configuration.getNumberOfAccesses());
+                    configuration.getNumberOfAccesses(),
+                    i,
+                    rmiPort);
         }
     }
 
@@ -74,22 +78,25 @@ public class Dispatcher {
         execOnRemote(session, String.format("nohup java -jar %s %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, totalAccesses, rmiPort));
     }
 
-    private void startClient(String jarPath, SSHCredentials clientInfo,
-                                InetAddress serverIp, int serverPort, int numAccesses) throws JSchException, SftpException {
+    private void startClient(String jarPath, SSHCredentials clientInfo, String logFile, ClientType type,
+                                InetAddress serverIp, int serverPort, int numAccesses, int clientId, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(clientInfo);
         copyToRemote(session, jarPath, jarPath);
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %s %d %d > client.log  2>&1 &", jarPath, serverIp, serverPort, numAccesses));
+        execOnRemote(session, String.format("nohup java -jar %s %s %s %d %d %d %d > %s  2>&1 &", jarPath, type,
+                serverIp, serverPort, numAccesses, clientId, rmiPort, logFile));
     }
 
-    private void startReader(SSHCredentials readerInfo,
-                                InetAddress serverIp, int serverPort, int numAccesses) throws SftpException, JSchException {
-        startClient(READER_JAR_PATH, readerInfo, serverIp, serverPort, numAccesses);
+    private void startReader(SSHCredentials readerInfo, InetAddress serverIp, int serverPort,
+                             int numAccesses, int readerId, int rmiPort) throws SftpException, JSchException {
+        startClient(READER_JAR_PATH, readerInfo, String.format("reader-%d.log", readerId), ClientType.READER,
+                serverIp, serverPort, numAccesses, readerId, rmiPort);
     }
 
-    private void startWriter(SSHCredentials writerInfo,
-                                InetAddress serverIp, int serverPort, int numAccesses) throws SftpException, JSchException {
-        startClient(WRITER_JAR_PATH, writerInfo, serverIp, serverPort, numAccesses);
+    private void startWriter(SSHCredentials writerInfo, InetAddress serverIp, int serverPort,
+                             int numAccesses, int writerId, int rmiPort) throws SftpException, JSchException {
+        startClient(WRITER_JAR_PATH, writerInfo, String.format("writer-%d.log", writerId), ClientType.WRITER,
+                serverIp, serverPort, numAccesses, writerId, rmiPort);
     }
 
     public static void main(String[] args) {

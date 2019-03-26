@@ -11,8 +11,8 @@ import java.io.IOException;
 public class Writer extends Client {
     private int numberOfAccesses;
 
-    public Writer(int id, String serverIP, int port, int numberOfAccesses) throws IOException {
-        super(id, serverIP, port);
+    public Writer(int id, RequestExecutor executor, int numberOfAccesses) throws IOException {
+        super(id, executor);
         this.numberOfAccesses = numberOfAccesses;
         BufferedWriter out = new BufferedWriter(
                 new FileWriter("log" + id));
