@@ -13,7 +13,7 @@ import java.net.UnknownHostException;
 
 public class Dispatcher {
     private static final String SERVER_JAR_PATH = "server.jar";
-    private static final String CLIENT_JAR_PATH = "client.jar";
+    private static final String CLIENT_JAR_PATH = "client%s.jar";
 
     public Dispatcher() {
         JSch.setConfig("StrictHostKeyChecking", "no");
@@ -88,10 +88,10 @@ public class Dispatcher {
     private void startClient(SSHCredentials clientInfo, String logFile, ClientType type,
                                 InetAddress serverIp, int serverPort, int numAccesses, int clientId, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(clientInfo);
-        copyToRemote(session, CLIENT_JAR_PATH, CLIENT_JAR_PATH);
+        copyToRemote(session, String.format(CLIENT_JAR_PATH, ""), String.format(CLIENT_JAR_PATH, "-" + clientId + "-" + type.toString()));
         copyToRemote(session, "all.policy", "all.policy");
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -Djava.security.policy=all.policy -jar %s %s %s %d %d %d %d > %s  2>&1 &", CLIENT_JAR_PATH, type.toString(),
+        execOnRemote(session, String.format("nohup java -Djava.security.policy=all.policy -jar %s %s %s %d %d %d %d > %s  2>&1 &", String.format(CLIENT_JAR_PATH, "-" + clientId + "-" + type.toString()), type.toString(),
                 serverIp.getHostAddress(), serverPort, numAccesses, clientId, rmiPort, logFile));
         session.disconnect();
     }
