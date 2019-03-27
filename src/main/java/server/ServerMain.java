@@ -1,6 +1,7 @@
 package server;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 public class ServerMain {
 
@@ -11,6 +12,8 @@ public class ServerMain {
 
         int serverPort = Integer.parseInt(args[0]);
         int numRequests = Integer.parseInt(args[1]);
+
+        System.out.println(Arrays.toString(args));
 
         Server server = null;
         try {

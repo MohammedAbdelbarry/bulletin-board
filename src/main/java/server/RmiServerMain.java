@@ -6,6 +6,7 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.Arrays;
 
 public class RmiServerMain {
     public static void main(String[] args) {
@@ -16,6 +17,8 @@ public class RmiServerMain {
         int numRequests = Integer.parseInt(args[1]);
         numRequests *= Integer.parseInt(args[2]);
         int rmiPort = Integer.parseInt(args[3]);
+
+        System.out.println(Arrays.toString(args));
 
         FileHandler handler = new FileHandler();
         try {
@@ -28,6 +31,7 @@ public class RmiServerMain {
             handler.log();
             reg.unbind("bulletin");
             UnicastRemoteObject.unexportObject(handler, true);
+            System.exit(0);
         } catch (RemoteException | AlreadyBoundException | InterruptedException | NotBoundException e) {
             e.printStackTrace();
         }
