@@ -33,11 +33,11 @@ public class Server {
             ClientHandler clientHandler = new ClientHandler(clientSocket,
                         fileHandler);
             clientHandler.start();
+            clientHandlers.add(clientHandler);
             numberOfClients--;
             if (numberOfClients == 0) {
                 break;
             }
-            clientHandlers.add(clientHandler);
         }
         stop();
     }
