@@ -55,7 +55,6 @@ public class Dispatcher {
     private Session getSession(SSHCredentials creds) throws JSchException {
         JSch jsch = new JSch();
         Session session = jsch.getSession(creds.getUserName(), creds.getMachineAddress());
-        System.out.println(creds.getUserName() + " " + creds.getMachineAddress() + " " + creds.getPassword());
         session.setPassword(creds.getPassword());
         session.connect();
 
@@ -64,8 +63,6 @@ public class Dispatcher {
 
     private void copyToRemote(Session session, String localPath, String remotePath) throws JSchException, SftpException {
         ChannelSftp sftpChannel = (ChannelSftp) session.openChannel("sftp");
-//        sftpChannel.lcd(System.getProperty("user.dir"));
-        System.out.println(sftpChannel.lpwd());
         sftpChannel.connect();
         sftpChannel.put(localPath, remotePath);
         sftpChannel.disconnect();
@@ -82,8 +79,9 @@ public class Dispatcher {
     private void startServer(SSHCredentials serverInfo, int port, int numberOfClients, int numberOfAccesses, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(serverInfo);
         copyToRemote(session, SERVER_JAR_PATH, SERVER_JAR_PATH);
+        copyToRemote(session, "all.policy", "all.policy");
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %d %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, numberOfClients, numberOfAccesses, rmiPort));
+        execOnRemote(session, String.format("nohup java -Djava.security.policy=all.policy -jar %s %d %d %d %d > server.log  2>&1 &", SERVER_JAR_PATH, port, numberOfClients, numberOfAccesses, rmiPort));
         session.disconnect();
     }
 
@@ -91,8 +89,9 @@ public class Dispatcher {
                                 InetAddress serverIp, int serverPort, int numAccesses, int clientId, int rmiPort) throws JSchException, SftpException {
         Session session = getSession(clientInfo);
         copyToRemote(session, CLIENT_JAR_PATH, CLIENT_JAR_PATH);
+        copyToRemote(session, "all.policy", "all.policy");
         // Redirect stdout to client.log and stderr to stdout for ssh not to hang (more info here https://stackoverflow.com/a/6274137)
-        execOnRemote(session, String.format("nohup java -jar %s %s %s %d %d %d %d > %s  2>&1 &", CLIENT_JAR_PATH, type.toString(),
+        execOnRemote(session, String.format("nohup java -Djava.security.policy=all.policy -jar %s %s %s %d %d %d %d > %s  2>&1 &", CLIENT_JAR_PATH, type.toString(),
                 serverIp.getHostAddress(), serverPort, numAccesses, clientId, rmiPort, logFile));
         session.disconnect();
     }

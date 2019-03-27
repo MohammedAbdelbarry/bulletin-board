@@ -2,6 +2,7 @@ package server;
 
 import java.rmi.AlreadyBoundException;
 import java.rmi.NotBoundException;
+import java.rmi.RMISecurityManager;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -19,6 +20,10 @@ public class RmiServerMain {
         int rmiPort = Integer.parseInt(args[3]);
 
         System.out.println(Arrays.toString(args));
+
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+        }
 
         FileHandler handler = new FileHandler();
         try {

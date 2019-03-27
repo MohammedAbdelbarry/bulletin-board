@@ -5,6 +5,7 @@ import server.RemoteHandler;
 
 import java.io.IOException;
 import java.rmi.NotBoundException;
+import java.rmi.RMISecurityManager;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.Arrays;
@@ -24,6 +25,10 @@ public class RmiClientMain {
         int rmiPort = Integer.parseInt(args[5]);
 
         System.out.println(Arrays.toString(args));
+
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+        }
 
         try {
             Registry registry = LocateRegistry.getRegistry(serverIp, rmiPort);
